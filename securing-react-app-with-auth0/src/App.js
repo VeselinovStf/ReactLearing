@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
 import Navigation from "./common/Navigation";
@@ -20,7 +20,16 @@ class App extends React.Component {
         <div className="container">
           <Switch>
             <Route exact path="/" component={Home} />
-            <Route path="/profile" component={Profile} />
+            <Route
+              path="/profile"
+              render={(props) =>
+                this.auth0.isAuthenticated() ? (
+                  <Profile auth={this.auth0} {...props} />
+                ) : (
+                  <Redirect to="/" />
+                )
+              }
+            />
             <Route
               path="/callback"
               render={(props) => <Callback auth={this.auth0} {...props} />}
