@@ -1,6 +1,11 @@
 import auth0 from "auth0-js";
 const REDIRECT_ON_LOGIN_LOCATION = "redirect_on_login";
 
+let _scopes = null;
+let _accessToken = null;
+let _expiresAt = null;
+let _id_token = null;
+
 export default class Auth {
   constructor(history) {
     this.history = history;
@@ -59,18 +64,17 @@ export default class Auth {
       authResult.expiresIn * 1000 + new Date().getTime()
     );
 
-    const scopes = authResult.scope || this.requestedScopes || "";
+    const scopes = _scopes || this.requestedScopes || "";
 
-    localStorage.setItem("access_token", authResult.accessToken);
-    localStorage.setItem("id_token", authResult.idToken);
-    localStorage.setItem("expires_at", expiresAtDate);
-    localStorage.setItem("scopes", JSON.stringify(scopes));
+    _accessToken = authResult.accessToken;
+    _id_token = authResult.idToken;
+    _expiresAt = expiresAtDate;
+    _scopes = JSON.stringify(scopes);
+    this.scheduleTokenRenu();
   }
 
   isAuthenticated() {
-    const expires_at = JSON.parse(localStorage.getItem("expires_at"));
-
-    return new Date().getTime() < expires_at;
+    return new Date().getTime() < _expiresAt;
   }
 
   removeSession() {
@@ -81,8 +85,7 @@ export default class Auth {
   }
 
   getAccessTocken() {
-    const accessToken = localStorage.getItem("access_token");
-    if (accessToken) return accessToken;
+    if (_accessToken) return _accessToken;
 
     throw new Error("No access token found!");
   }
@@ -96,10 +99,24 @@ export default class Auth {
   };
 
   userHasScope(scopes) {
-    const grantedScopes = (
-      JSON.parse(localStorage.getItem("scopes")) || ""
-    ).split(" ");
+    return scopes.every((scope) => _scopes.includes(scope));
+  }
 
-    return scopes.every((scope) => grantedScopes.includes(scope));
+  renewToken(cb) {
+    this.auth0.checkSession({}, (err, result) => {
+      if (err) {
+        console.log(`$ERROR:  ${err.error} - {err.error_description}`);
+      } else {
+        this.setSession(result);
+      }
+
+      if (cb) cb(err, result);
+    });
+  }
+
+  scheduleTokenRenu() {
+    const delay = _expiresAt - Date.now();
+
+    if (delay > 0) setTimeout(() => this.renewToken(), delay);
   }
 }
