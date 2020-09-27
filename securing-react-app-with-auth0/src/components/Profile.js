@@ -28,6 +28,7 @@ class Profile extends Component {
           <h1>{profile.nickname}</h1>
           <p className="profileTitle">{profile.name}</p>
           <p>{profile.email}</p>
+          {console.log(profile)}
         </div>
         ;
       </>

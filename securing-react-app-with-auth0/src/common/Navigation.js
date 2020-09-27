@@ -17,12 +17,32 @@ class Navigation extends Component {
                 Home
               </NavLink>
             </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/public">
+                Public
+              </NavLink>
+            </li>
             {this.props.auth.isAuthenticated() === true && (
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/profile">
-                  Profile
-                </NavLink>
-              </li>
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/private">
+                    Private
+                  </NavLink>
+                </li>
+                {this.props.auth.userHasScope(["read:courses"]) === true && (
+                  <li className="nav-item">
+                    <NavLink className="nav-link" to="/courses">
+                      Courses
+                    </NavLink>
+                  </li>
+                )}
+
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/profile">
+                    Profile
+                  </NavLink>
+                </li>
+              </>
             )}
           </ul>
 

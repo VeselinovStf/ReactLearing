@@ -6,37 +6,54 @@ import Navigation from "./common/Navigation";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import Auth from "./Auth/Auth";
 import Callback from "./Auth/Callback";
+import Public from "./components/Public";
+import Private from "./components/Private";
+import Courses from "./components/Courses";
+import PrivateRoute from "./PrivateRoute";
+import AuthContext from "./AuthContext";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.auth0 = new Auth(this.props.history);
+    this.state = {
+      auth: new Auth(this.props.history),
+    };
   }
 
   render() {
+    const { auth } = this.state;
     return (
-      <>
-        <Navigation auth={this.auth0} />
+      <AuthContext.Provider value={this.state.auth}>
+        <Navigation auth={auth} />
         <div className="container">
           <Switch>
             <Route exact path="/" component={Home} />
-            <Route
+            <PrivateRoute
               path="/profile"
-              render={(props) =>
-                this.auth0.isAuthenticated() ? (
-                  <Profile auth={this.auth0} {...props} />
-                ) : (
-                  <Redirect to="/" />
-                )
-              }
+              // auth={auth}
+              component={Profile}
+              scope={[]}
             />
+            <PrivateRoute
+              path="/private"
+              // auth={auth}
+              component={Private}
+              scope={[]}
+            />
+            <PrivateRoute
+              path="/courses"
+              // auth={auth}
+              scope={["read:courses"]}
+              component={Courses}
+            />
+            <Route path="/public" component={Public} />
             <Route
               path="/callback"
-              render={(props) => <Callback auth={this.auth0} {...props} />}
+              render={(props) => <Callback auth={auth} {...props} />}
             />
           </Switch>
         </div>
-      </>
+      </AuthContext.Provider>
     );
   }
 }
