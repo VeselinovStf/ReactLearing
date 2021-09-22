@@ -4,14 +4,17 @@
 
 ### TODO's
 
-1. Create Firebase db
-    - Firestore db
-    - Store 
+1. Database
+    - Use Firestore db
+    - Use Firestore Store 
 2. Create Image uploading functionality
     - Upload Form
     - Create custom hook
 3. Diplay Image uploading progress
     - Progress Bar
 4. Display images
-    - Gallery
-
+    - Create custom hook
+    - Create Gallery component
+    - Create modal component 
+5. Adding custom animations
+    - Adding use of Framer Motions

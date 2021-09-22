@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import useUploadImageStorage from '../hooks/useUploadImageStorage';
+import { motion } from 'framer-motion'
 
 const ProgressBar = ({file,setFile}) => {
     const { url, progress} = useUploadImageStorage(file);
@@ -11,9 +12,12 @@ const ProgressBar = ({file,setFile}) => {
     }, [file,setFile,url]);
 
   return (
-    <div className="progress-bar" style={{width: progress + "%"}}>
+    <motion.div className="progress-bar" 
+        initial={{width:0}}
+        animate={{width: progress + "%"}}
+        >
         
-    </div>
+      </motion.div>
   );
 }
 
